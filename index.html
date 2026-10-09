@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Mood Mix — discover songs by mood in a cozy vinyl listening room.">
+  <title>Mood Mix — Songs for every feeling</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --wine: #6b1d2a;
+      --wine-deep: #3a1018;
+      --ink: #12090c;
+      --shelf: #1a0c10;
+      --amber: #e8b86a;
+      --amber-soft: #f3d19a;
+      --glow: rgba(232, 184, 106, 0.22);
+      --paper: #f4e6d0;
+      --muted: #cbb8a8;
+      --card: #241014;
+      --line: rgba(232, 184, 106, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--paper);
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.55;
+      background:
+        radial-gradient(1200px 500px at 50% -10%, rgba(232, 184, 106, 0.18), transparent 55%),
+        radial-gradient(700px 400px at 90% 20%, rgba(107, 29, 42, 0.55), transparent 60%),
+        linear-gradient(180deg, #2a1016 0%, var(--ink) 38%, #0a0506 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 46px,
+        rgba(0, 0, 0, 0.18) 46px 48px
+      );
+      opacity: 0.18;
+      z-index: 0;
+    }
+
+    a { color: var(--amber); }
+
+    button, input {
+      font: inherit;
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin-inline: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      padding: 22px 0 8px;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--paper);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .logo-disc {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #f3d19a 0 7px, #1a0c10 8px 12px, #2b1218 13px 18px, #12090c 19px),
+        repeating-radial-gradient(circle at 50% 50%, #1c0d12 0 1px, #2a1419 2px 3px);
+      box-shadow: 0 0 0 2px rgba(232, 184, 106, 0.35), 0 8px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav small {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .hero {
+      padding: 42px 0 18px;
+      text-align: center;
+    }
+
+    .lamp {
+      width: 120px;
+      height: 18px;
+      margin: 0 auto 18px;
+      border-radius: 0 0 60px 60px;
+      background: linear-gradient(180deg, #d9a24a, #8a5a1e);
+      box-shadow: 0 18px 50px 20px var(--glow);
+      position: relative;
+    }
+
+    .lamp::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -22px;
+      width: 8px;
+      height: 22px;
+      transform: translateX(-50%);
+      background: #3a2414;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2.4rem, 7vw, 4.6rem);
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      text-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .hero p {
+      max-width: 620px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .controls {
+      margin: 28px auto 0;
+      max-width: 820px;
+      background: rgba(26, 12, 16, 0.78);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(243, 209, 154, 0.12);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-row label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    .search-row input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: #16090c;
+      color: var(--paper);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .search-row input:focus {
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+
+    .search-row button,
+    .moods button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 11px 18px;
+      background: linear-gradient(180deg, #e8b86a, #c8893a);
+      color: #2a1408;
+      font-weight: 700;
+    }
+
+    .search-row button:hover,
+    .moods button:hover {
+      filter: brightness(1.06);
+    }
+
+    .moods {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .moods button {
+      background: transparent;
+      color: var(--amber-soft);
+      border: 1px solid var(--line);
+    }
+
+    .moods button[aria-pressed="true"] {
+      background: linear-gradient(180deg, #e8b86a, #c8893a);
+      color: #2a1408;
+      border-color: transparent;
+    }
+
+    main { padding: 28px 0 70px; }
+
+    .results-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .results-head h2 {
+      margin: 0;
+      font-size: 1.45rem;
+    }
+
+    .count {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #2c1419 0%, var(--card) 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 14px;
+      box-shadow: 0 16px 28px rgba(0, 0, 0, 0.32);
+      min-width: 0;
+    }
+
+    .vinyl {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      position: relative;
+      background:
+        radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.16), transparent 28%),
+        repeating-radial-gradient(circle at 50% 50%, #1a0d11 0 2px, #2a151b 3px 5px);
+      box-shadow: inset 0 0 0 8px var(--label), 0 10px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .vinyl::after {
+      content: "";
+      position: absolute;
+      inset: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, #f3d19a 0 6px, var(--label) 7px);
+    }
+
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 1.05rem;
+    }
+
+    .card .artist {
+      margin: 0;
+      color: var(--amber-soft);
+      font-size: 0.95rem;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-family: system-ui, sans-serif;
+    }
+
+    .reason {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 36px 18px;
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      color: var(--muted);
+      background: rgba(18, 9, 12, 0.45);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 0 0 36px;
+      font-size: 0.9rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 620px) {
+      .wrap { width: calc(100% - 24px); }
+      .nav small { display: none; }
+      .search-row { flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .card { grid-template-columns: 72px 1fr; }
+      .vinyl { width: 72px; height: 72px; }
+      .vinyl::after { inset: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="wrap nav" aria-label="Main">
+      <a class="brand" href="#">
+        <span class="logo-disc" aria-hidden="true"></span>
+        Mood Mix
+      </a>
+      <small>A late-night vinyl shelf</small>
+    </nav>
+  </header>
+
+  <section class="hero wrap" aria-labelledby="page-title">
+    <div class="lamp" aria-hidden="true"></div>
+    <h1 id="page-title">Put on a feeling.</h1>
+    <p>Browse a warm record shelf by mood. Filter the room, search a title or artist, and find a track that fits the night.</p>
+
+    <div class="controls">
+      <form id="search-form" class="search-row" role="search">
+        <label for="query">Search by song title or artist</label>
+        <input id="query" type="search" placeholder="Search a title or artist…" autocomplete="off">
+        <button type="submit">Search</button>
+      </form>
+      <div class="moods" role="group" aria-label="Mood filters">
+        <button type="button" data-mood="all" aria-pressed="true">All moods</button>
+        <button type="button" data-mood="happy" aria-pressed="false">Happy</button>
+        <button type="button" data-mood="relaxed" aria-pressed="false">Relaxed</button>
+        <button type="button" data-mood="heartbroken" aria-pressed="false">Heartbroken</button>
+        <button type="button" data-mood="energetic" aria-pressed="false">Energetic</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div class="results-head">
+      <h2>On the shelf tonight</h2>
+      <p id="count" class="count" aria-live="polite"></p>
+    </div>
+    <div id="results" class="grid" aria-live="polite"></div>
+  </main>
+
+  <footer>Mood Mix · sample recommendations for a cozy listening room</footer>
+
+  <script>
+    const songs = [
+      { title: "Golden Hour", artist: "JVKE", genre: "Pop", mood: "happy", reason: "Sunlit vocals that make an ordinary evening feel like a good day.", label: "#c45c3a" },
+      { title: "Here Comes the Sun", artist: "The Beatles", genre: "Rock", mood: "happy", reason: "A gentle lift after rain — the classic smile of a Saturday morning.", label: "#d9a24a" },
+      { title: "August", artist: "Taylor Swift", genre: "Indie pop", mood: "happy", reason: "Wistful warmth, like windows down on a late-summer drive.", label: "#b86b4a" },
+      { title: "Holocene", artist: "Bon Iver", genre: "Folk", mood: "relaxed", reason: "Quiet guitar and winter air — a record you leave spinning while you read.", label: "#6f8f8a" },
+      { title: "Pink + White", artist: "Frank Ocean", genre: "R&B", mood: "relaxed", reason: "Soft clouds of harmony; the room slows down around it.", label: "#d4a0a8" },
+      { title: "Sunset Lover", artist: "Petit Biscuit", genre: "Electronic", mood: "relaxed", reason: "Warm pads and a slow pulse, like amber light on vinyl.", label: "#c8893a" },
+      { title: "Someone Like You", artist: "Adele", genre: "Soul", mood: "heartbroken", reason: "A piano and a voice that sit with you instead of rushing the feeling.", label: "#7a2a3a" },
+      { title: "Motion Sickness", artist: "Phoebe Bridgers", genre: "Indie", mood: "heartbroken", reason: "Tender, wry, and a little raw — heartbreak with the lights still low.", label: "#8d4a62" },
+      { title: "The Night We Met", artist: "Lord Huron", genre: "Folk", mood: "heartbroken", reason: "A late-night rewind of a memory you cannot quite put away.", label: "#4a3048" },
+      { title: "Don't Start Now", artist: "Dua Lipa", genre: "Disco pop", mood: "energetic", reason: "Bassline and glitter — the kind of track that makes the shelf dance.", label: "#e07a3a" },
+      { title: "Seven Nation Army", artist: "The White Stripes", genre: "Rock", mood: "energetic", reason: "A riff that fills the whole room and asks your feet to keep up.", label: "#c0392b" },
+      { title: "Levitating", artist: "Dua Lipa", genre: "Pop", mood: "energetic", reason: "Bright, buoyant, and built for a kitchen that suddenly becomes a dance floor.", label: "#d4a017" }
+    ];
+
+    const query = document.querySelector("#query");
+    const results = document.querySelector("#results");
+    const count = document.querySelector("#count");
+    const moodButtons = [...document.querySelectorAll(".moods button")];
+    let mood = "all";
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function render() {
+      const q = query.value.trim().toLowerCase();
+      const found = songs.filter((song) => {
+        const matchesMood = mood === "all" || song.mood === mood;
+        const haystack = `${song.title} ${song.artist}`.toLowerCase();
+        const matchesQuery = !q || haystack.includes(q);
+        return matchesMood && matchesQuery;
+      });
+
+      count.textContent = `${found.length} ${found.length === 1 ? "record" : "records"}`;
+
+      results.innerHTML = found.length
+        ? found.map((song) => `
+            <article class="card">
+              <div class="vinyl" style="--label:${song.label}" aria-hidden="true"></div>
+              <div>
+                <h3>${escapeHtml(song.title)}</h3>
+                <p class="artist">${escapeHtml(song.artist)}</p>
+                <div class="meta">
+                  <span class="tag">${escapeHtml(song.genre)}</span>
+                  <span class="tag">${escapeHtml(song.mood)}</span>
+                </div>
+                <p class="reason">${escapeHtml(song.reason)}</p>
+              </div>
+            </article>
+          `).join("")
+        : `<p class="empty">Nothing on this shelf matches yet. Try another mood or a different search.</p>`;
+    }
+
+    document.querySelector("#search-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      render();
+    });
+
+    query.addEventListener("input", render);
+
+    moodButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        mood = button.dataset.mood;
+        moodButtons.forEach((item) => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
